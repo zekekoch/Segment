@@ -11,7 +11,7 @@
 
 #include <Arduino.h> //It is very important to remember this! note that if you are using Arduino 1.0 IDE, change "WProgram.h" to "Arduino.h"
 
-static enum Strand
+enum Strand
 {
     RingTop,
     RingMiddle,
@@ -20,7 +20,64 @@ static enum Strand
     VMiddle,
     VBottom,
     Vertical
-} StrandIndex;
+} StrandType;
+
+enum SegmentEnum
+{
+    RingTopBackCenter,
+    RingTopBackRightInner,
+    RingTopBackRightOuter,
+    RingTopLeft,
+    RingTopFrontLeftOuter,
+    RingTopFrontLeftInner,
+    RingTopFrontRightInner,
+    RingTopFrontRightOuter,
+    RingTopRight,
+    RingTopBackLeftOuter,
+    RingTopBackLeftInner,
+    
+    RingMiddleBackCenter,
+    RingMiddleBackRightInner,
+    RingMiddleBackRightOuter,
+    RingMiddleLeft,
+    RingMiddleFrontLeftInner,
+    RingMiddleFrontRightInner,
+    RingMiddleRight,
+    RingMiddleBackLeftOuter,
+    RingMiddleBackLeftInner,
+    
+    RingBottomBackCenter,
+    RingBottomBackRightInner,
+    RingBottomLeft,
+    RingBottomRight,
+    RingBottomBackLeftInner,
+    
+    VTopBackCenter,
+    VTopRight,
+    VTopLeft,
+    
+    VMiddleBackCenter,
+    VMiddleBackLeftLower,
+    VMiddleBackLeftMiddle,
+    VMiddleBackLeftUpper,
+    VMiddleFrontRightMiddle,
+    VMiddleFrontLeftMiddle,
+    VMiddleBackRightUpper,
+    VMiddleBackRightMiddle,
+    VMiddleBackRightLower,
+    
+    VBottomBackCenter,
+    VBottomBackRightLower,
+    VBottomBackRightMiddle,
+    VBottomBackRightTop,
+    VBottomFrontLeftMiddle,
+    VBottomFrontLeftLower,
+    VBottomFrontRightLower,
+    VBottomFrontRightMiddle,
+    VBottomBackLeftTop,
+    VBottomBackLeftMiddle,
+    VBottomBackLeftLower,
+};
 
 
 class Segment
@@ -35,15 +92,19 @@ public:
 
     int lightMap[LightMapSize];
     int length;
+    Strand strand;
+    SegmentEnum segment;
 
     Segment()
     {
         
     }
     
-    Segment(String segment)
+    Segment(SegmentEnum segmentEnum, String bitField, Strand segmentStrand)
     {
-        length = segment.length();
+        length = bitField.length();
+        segment = segmentEnum;
+        strand = segmentStrand;
         int chunk = 0;
         int bit = 0;
         
@@ -52,7 +113,7 @@ public:
         {
             // crudely convert the current character to a digit (should be 1 or 0)
             // then set that bit in the current segment
-            if (1 == segment[light] - '0')
+            if (1 == bitField[light] - '0')
             {
                 lightMap[chunk] |= 1 << bit;
             }
@@ -69,9 +130,11 @@ public:
         }
     }
     
-    Segment(int s0, int s1, int s2, int s3, int segmentLength, Strand strand)
+    Segment(SegmentEnum segmentEnum, int s0, int s1, int s2, int s3, int segmentLength, Strand segmentStrand)
     {
+        segment = segmentEnum;
         length = segmentLength;
+        strand = segmentStrand;
         lightMap[0] = s0;
         lightMap[1] = s1;
         lightMap[2] = s2;
